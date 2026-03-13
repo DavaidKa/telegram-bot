@@ -19,7 +19,8 @@ class Settings(BaseSettings):
     # AI Services
     OPENAI_API_KEY: str = ""
     STABILITY_API_KEY: str = ""
-    
+    AI_API_KEY: str = ""
+
     # Bot Settings
     VIP_PRICE_USD: float = 2.0
     REFERRAL_BONUS_DAYS: int = 3
@@ -42,3 +43,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
