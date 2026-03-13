@@ -12,7 +12,8 @@ from middlewares.throttling import ThrottlingMiddleware
 from services.notification import notification_service
 
 # Импорт роутеров
-from handlers import start, content, games, premium, referral, admin
+from handlers import start, content, games, premium, referral, admin, homework, exam_helper
+from handlers import photo_solver as photo_solver_handler
 
 
 async def on_startup(bot: Bot):
@@ -85,14 +86,6 @@ async def main():
     """Главная функция"""
     logger.info("Запуск бота...")
     
-    # Запуск health check сервера для Render.com
-    try:
-        from render_health import start_health_server
-        asyncio.create_task(start_health_server())
-        logger.info("Health check сервер для Render запущен")
-    except Exception as e:
-        logger.warning(f"Health check сервер не запущен: {e}")
-    
     # Инициализация бота
     bot = Bot(
         token=settings.BOT_TOKEN,
@@ -107,6 +100,9 @@ async def main():
     
     # Регистрация роутеров
     dp.include_router(start.router)
+    dp.include_router(homework.router)
+    dp.include_router(photo_solver_handler.router)
+    dp.include_router(exam_helper.router)
     dp.include_router(content.router)
     dp.include_router(games.router)
     dp.include_router(premium.router)
@@ -121,6 +117,17 @@ async def main():
     scheduler = setup_scheduler(bot)
     scheduler.start()
     
+    # Запуск health check сервера для Render.com
+    health_server_task = None
+    try:
+        from render_health import start_health_server
+        health_server_task = asyncio.create_task(start_health_server())
+        logger.info("Health check сервер запускается...")
+        # Даем серверу время запуститься
+        await asyncio.sleep(2)
+    except Exception as e:
+        logger.warning(f"Health check сервер не запущен: {e}")
+    
     logger.info("Бот успешно запущен!")
     
     try:
@@ -128,6 +135,8 @@ async def main():
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     finally:
         scheduler.shutdown()
+        if health_server_task:
+            health_server_task.cancel()
         await bot.session.close()
 
 
