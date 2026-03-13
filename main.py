@@ -12,8 +12,7 @@ from middlewares.throttling import ThrottlingMiddleware
 from services.notification import notification_service
 
 # Импорт роутеров
-from handlers import start, content, games, premium, referral, admin, homework, exam_helper
-from handlers import photo_solver as photo_solver_handler
+from handlers import start, content, games, premium, referral, admin, homework, exam_helper, photo_solver
 
 
 async def on_startup(bot: Bot):
@@ -101,13 +100,15 @@ async def main():
     # Регистрация роутеров
     dp.include_router(start.router)
     dp.include_router(homework.router)
-    dp.include_router(photo_solver_handler.router)
+    dp.include_router(photo_solver.router)
     dp.include_router(exam_helper.router)
     dp.include_router(content.router)
     dp.include_router(games.router)
     dp.include_router(premium.router)
     dp.include_router(referral.router)
     dp.include_router(admin.router)
+    
+    logger.info("✅ Все роутеры зарегистрированы")
     
     # Регистрация событий
     dp.startup.register(on_startup)
