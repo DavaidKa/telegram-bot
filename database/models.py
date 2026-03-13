@@ -143,4 +143,3 @@ class Achievement(Base):
     description = Column(Text)
     
     unlocked_at = Column(DateTime, default=datetime.utcnow)
-
